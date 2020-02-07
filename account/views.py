@@ -35,15 +35,13 @@ class LogInView(View):
         data = json.loads(request.body)
         user_email = data['email']
         user_pw    = data['password']
-        existing_user_email = Account.objects.get(email=user_email)
-        existing_user_pw = Account.objects.get(password=user_pw)
         try:
-            user_email = existing_user_email
+            existing_user_email = Account.objects.get(email=user_email)
             try:
-                user_pw == existing_user_pw
+                existing_user_email.password = Account.objects.get(password=user_pw)
             except:
                 return JsonResponse({'message':'password does not match'}, status=401)
         except Account.DoesNotExist:
-            return JsonResponse({'message':'user does not exist'}, status = 401)
+            return JsonResponse({'message':'user does not exist'}, status = 401)    
         return JsonResponse({'message':'success'}, status = 200)
 

@@ -32,18 +32,18 @@ class AccountView(View):
 
 class LogInView(View):
     def post(self, request):
-        # 유저가 입력한 값 json 포맷으로 바꿔주기
         data = json.loads(request.body)
-        # 유저가 입력한 email과 pw 변수에 등록
         user_email = data['email']
-        user_pw = data['password']
-        # Account에 들어있는 요소 불러오기
-        existing_users = Account.objects.values()
-        # 유저입력값과 Account의 요소비교
-        for user in existing_users:
-            for key in user:
-                if  user['email'] == user_email and user['password'] == user_pw:
-                    return JsonResponse({'message':'log in success'}, status = 200)
-                else:
-                    return JsonResponse({'message':'try again'}, status = 404)
+        user_pw    = data['password']
+        existing_user_email = Account.objects.get(email=user_email)
+        existing_user_pw = Account.objects.get(password=user_pw)
+        try:
+            user_email = existing_user_email
+            try:
+                user_pw == existing_user_pw
+            except:
+                return JsonResponse({'message':'password does not match'}, status=401)
+        except Account.DoesNotExist:
+            return JsonResponse({'message':'user does not exist'}, status = 401)
+        return JsonResponse({'message':'success'}, status = 200)
 

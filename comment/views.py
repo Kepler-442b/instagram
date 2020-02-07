@@ -13,5 +13,10 @@ class CommentView(View):
                 text = data['text']
                 ).save()
         return HttpResponse(status = 200)
+    
+    def get(self, request):
+        comment_data = Account.objects.values()
+        return JsonReponse({'comment':list(comment_data)}, status = 200)
+
 
 

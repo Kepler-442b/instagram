@@ -3,7 +3,7 @@ import json
 from .models import Account
 
 from django.views import View
-from django.http import HttpResponse, JsonResponse
+from django.http  import HttpResponse, JsonResponse
 
 class AccountView(View):
     def post(self, request):
@@ -20,28 +20,18 @@ class AccountView(View):
         account_data = Account.objects.values()
         return JsonResponse({'account':list(account_data)}, status = 200)
 
-      #  account_data =  Account.objects.all()
-      #  accounts = []
-      #  for account in account_data:
-      #      accounts.append({
-      #          'name': account.name,
-      #          'email': account.email,
-      #          'password': account.password
-      #          })
-      #  print(accounts)
-
 class LogInView(View):
     def post(self, request):
-        data = json.loads(request.body)
-        user_email = data['email']
-        user_pw    = data['password']
+        data = json.loads(request.body) 
         try:
-            existing_user_email = Account.objects.get(email=user_email)
-            try:
-                existing_user_email.password = Account.objects.get(password=user_pw)
-            except:
-                return JsonResponse({'message':'password does not match'}, status=401)
-        except Account.DoesNotExist:
-            return JsonResponse({'message':'user does not exist'}, status = 401)    
-        return JsonResponse({'message':'success'}, status = 200)
+            if Account.objects.filter(email=data['email']).exists():
+                user = Account.objects.get(email=data['email'])
 
+                if data['password'] == user.password:
+                    return JsonResponse({'message':'SUCCESS'}, status = 200)
+                return HttpResponse(status=401)
+
+            return JsonResponse({'message':'USER_DOES_NOT_EXIST'}, status = 400)
+
+        except KeyError:
+            return json({'message':'INVALID_KEY'})

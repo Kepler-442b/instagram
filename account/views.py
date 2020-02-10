@@ -8,6 +8,10 @@ from django.http  import HttpResponse, JsonResponse
 class AccountView(View):
     def post(self, request):
         data = json.loads(request.body)
+
+        if Account.objects.filter(email=data['email']).exists():
+            return JsonResponse({'message':'USER_ALREADY_EXISTS'}, status = 400)
+        
         Account(
             name     = data['name'],
             email    = data['email'],
@@ -34,4 +38,4 @@ class LogInView(View):
             return JsonResponse({'message':'USER_DOES_NOT_EXIST'}, status = 400)
 
         except KeyError:
-            return json({'message':'INVALID_KEY'})
+            return JsonResponse({'message':'INVALID_KEY'}, status = 400)
